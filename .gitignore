@@ -1,0 +1,26 @@
+# 주석은 #으로 시작합니다.
+
+# 특정 파일 무시
+example.log
+*.tmp
+mysecretfile.key
+
+# 특정 디렉토리 무시
+/node_modules/
+/build/
+/dist/
+
+# 특정 확장자를 가진 모든 파일 무시
+*.log
+*.DS_Store # macOS 관련 파일
+*.env # 환경 변수 파일
+
+# 특정 디렉토리 내의 모든 파일 무시 (디렉토리 자체는 추적)
+logs/*.log
+
+# 특정 파일만 제외하고 디렉토리 내의 모든 파일 무시
+!important.txt
+/myfolder/*
+!/myfolder/keepthisfile.txt
+
+# 빈 줄은 무시됩니다.
