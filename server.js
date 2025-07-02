@@ -1,3 +1,4 @@
+// MKF system의 모든 server.js
 require('dotenv').config()
 const express = require('express')
 const { Pool } = require('pg')
