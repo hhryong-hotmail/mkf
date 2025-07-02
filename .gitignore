@@ -1,0 +1,60 @@
+# 운영체제 관련 파일 (macOS, Windows)
+.DS_Store
+Thumbs.db
+
+# 빌드 및 컴파일된 파일
+*.log
+*.tmp
+*.bak
+*.exe
+*.dll
+*.obj
+*.o
+*.class
+*.pyc  # Python 컴파일된 바이트코드
+__pycache__/
+
+# 패키지 매니저 설치 폴더
+node_modules/  # Node.js
+vendor/        # PHP Composer, Ruby Gems 등
+target/        # Java Maven/Gradle 빌드 아웃풋
+
+# IDE 및 에디터 관련 파일/폴더
+.idea/         # IntelliJ IDEA
+.vscode/       # VS Code
+*.iml          # IntelliJ IDEA 모듈 파일
+.project       # Eclipse
+.classpath     # Eclipse
+.settings/     # Eclipse
+
+# 환경 변수 파일 (민감 정보 포함 가능)
+.env           # 일반적으로 웹 프로젝트에서 사용
+
+# 로그 파일
+npm-debug.log* # npm 디버그 로그
+yarn-debug.log* # yarn 디버그 로그
+
+# 테스트 결과 보고서 등
+/coverage/
+
+# 에디터 백업 파일
+*~
+.#*
+
+# 압축 파일 (필요 없는 경우)
+*.zip
+*.tar.gz
+*.rar
+
+# Git 자체 파일 (보통 자동으로 무시됨)
+.git/
+.gitignore
+
+# 특정 폴더 내의 모든 내용을 무시하고 싶을 때
+# example_folder/
+
+# 특정 파일만 무시하고 싶을 때 (example_folder 안에 있어도)
+# example_folder/specific_file.txt
+
+# 특정 파일을 무시하지 않고 포함하고 싶을 때 (예: 위에서 logs/를 무시했지만, logs/important.log만 포함)
+# !logs/important.log
