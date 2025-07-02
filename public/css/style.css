@@ -1,0 +1,832 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
+}
+/* 기본 스타일 */
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 24px;
+}
+/* 여권번호와 전화번호 입력창 너비를 50%로 설정 */
+.half-width input {
+    width: 50%;
+}
+/* 필터 섹션 스타일 */
+.filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.form-row {
+ display: flex; /* Flexbox 레이아웃 사용 */
+ margin-bottom: 8px; /* 각 행 사이의 간격 조절 */
+ align-items: center; /* 세로 방향으로 중앙 정렬 */
+}
+
+.form-label {
+ display: flex; /* Flexbox 레이아웃 사용 */
+ flex: 1; /* 타이틀 영역이 1의 비율을 차지 */
+ padding-right: 10px; /* 타이틀과 입력 필드 사이의 간격 */
+ text-align: left; /* <--- 여기를 right 에서 left 로 변경 */
+ font-weight: bold; /* 타이틀 강조 (선택 사항) */
+ align-items: center; /* 세로 방향으로 중앙 정렬 (선택 사항) */
+}
+
+
+.form-input {
+ flex: 2; /* 입력 필드 영역이 2의 비율을 차지 */
+}
+
+.form-control {
+ width: 100%; /* 입력 필드의 너비를 부모 요소에 맞춤 */
+ padding: 8px;
+ border: 1px solid #ccc;
+ border-radius: 4px;
+ box-sizing: border-box; /* padding과 border가 width에 포함되도록 설정 */
+}
+
+.input-field { /* select 박스에도 적용하기 위한 클래스 (선택 사항) */
+ width: 100%;
+ padding: 8px;
+ border: 1px solid #ccc;
+ border-radius: 4px;
+ box-sizing: border-box;
+}
+/* 필터 행 스타일 */
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 5px; /* 기존 간격을 줄임 */
+  }
+  
+
+/* 필터 아이템 스타일 */
+
+.filter-item {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+  }
+
+.filter-item label {
+    font-weight: bold;
+    color: #666;
+    min-width: 70px;
+}
+
+select, input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    min-width: 120px;
+}
+
+select:hover, input[type="text"]:hover {
+    border-color: #999;
+}
+
+select:focus, input[type="text"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+#commitDate {
+    width: 100px;
+    text-align: center;
+    font-family: monospace;
+}
+
+/* 버튼 그룹 스타일 */
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+/* 버튼 스타일 */
+.primary-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.primary-button:hover {
+    background-color: #0056b3;
+}
+
+.secondary-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.secondary-button:hover {
+    background-color: #5a6268;
+}
+.clear-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 4px;
+    display: none;
+}
+
+.clear-button:hover {
+    color: #666;
+}
+
+/* 입력 필드와 셀렉트 박스 스타일 */
+input[type="text"],
+select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+#commitDate:valid + .clear-button,
+#commitDate:not(:placeholder-shown) + .clear-button {
+    display: block;
+}
+/* 테이블 스타일 */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.detail-table th,
+.detail-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+tr:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+#detail-view {
+    background-color: white;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#back-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#back-button:hover {
+    background-color: #0056b3;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-label {
+    font-weight: bold;
+    color: #666;
+}
+
+.detail-value {
+    color: #333;
+}
+
+.detail-value.editable input,
+.detail-value.editable select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.detail-value.editable input:focus,
+.detail-value.editable select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+/* 4행 간격 조정 */
+.button-row {
+    margin-top: 5px; /* 기존 간격을 줄임 */
+    gap: 8px; /* 버튼 간 간격 조정 */
+}
+
+.button-group {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.primary-button,
+.secondary-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.primary-button:hover {
+    background-color: #0056b3;
+}
+
+.secondary-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.secondary-button:hover {
+    background-color: #5a6268;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+/* 날짜 필터 스타일 */
+.date-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.date-range-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-separator {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.date-input-group input {
+    width: 100px;
+}
+
+.result-info {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    height: 38px;
+    min-width: 120px;
+}
+
+.record-count {
+    font-size: 14px;
+    color: #495057;
+    white-space: nowrap;
+}
+
+.record-count strong {
+    color: #007bff;
+    font-size: 16px;
+    margin: 0 4px;
+}
+
+.search-button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    height: 38px;
+    min-width: 60px;
+}
+
+.search-button:hover {
+    background-color: #218838;
+}
+
+.search-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.reset-button {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    height: 38px;
+    min-width: 60px;
+}
+
+.reset-button:hover {
+    background-color: #5a6268;
+}
+/* 기본 입력창 스타일 */
+input[type="text"], select {
+    width: 100%; /* 부모 요소의 전체 너비를 차지 */
+    /* max-width: 400px; /* 최대 너비 제한 */
+    /* padding: 8px; /* 내부 여백 */
+    /* font-size: 14px; /* 텍스트 크기 */
+    /* box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 계산 */
+  }
+/* 반응형 스타일 */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    .filter-row {
+        flex-direction: column;
+    }
+
+    .filter-buttons {
+        justify-content: flex-start;
+    }
+    .filter-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filter-item {
+        width: 100%;
+    }
+
+    .filter-item label {
+        min-width: 60px;
+    }
+
+    select, input[type="text"] {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .filter-group {
+        width: 100%;
+        margin-left: 0;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .date-filter {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .search-button, .reset-button {
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .result-info {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    /* 테이블 반응형 처리 */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
+
+/* 작은 화면에서의 추가 조정 */
+@media screen and (max-width: 480px) {
+    .filter-group {
+        flex-direction: column;
+    }
+
+    .date-filter, .search-button, .reset-button {
+        width: 100%;
+    }
+
+    .result-info {
+        margin-top: 5px;
+    }
+}
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    input[type="text"], select {
+      max-width: 100%; /* 작은 화면에서는 최대 너비를 부모 요소에 맞춤 */
+      font-size: 14px; /* 텍스트 크기 유지 */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    input[type="text"], select {
+      max-width: 100%; /* 작은 화면에서도 입력창이 부모 요소를 채움 */
+      /*font-size: 12px; /* 텍스트 크기를 조금 줄임 */
+    }
+  }
+  
+@media (max-width: 480px) {
+    .container {
+      padding: 10px;
+    }
+  
+    .detail-table th,
+    .detail-table td {
+      font-size: 12px;
+      padding: 4px;
+    }
+  
+    .button-group button {
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+  }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.modal-content p {
+    margin-bottom: 1rem;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+} 
+.primary-button.inactive {
+  background-color: #cccccc; /* 비활성화된 배경색 */
+  color: #666666; /* 비활성화된 글자색 */
+  cursor: not-allowed; /* 마우스 커서 변경 */
+  border: 1px solid #cccccc; /* 비활성화된 테두리 색상 */
+}
+
+/* 기본 스타일 */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.records-list {
+  width: 100%;
+  overflow-x: auto; /* 테이블이 화면을 넘어갈 경우 스크롤 가능 */
+}
+
+.detail-view {
+  display: none;
+}
+
+.deposit-sum {
+  font-size: 1.2rem;
+  text-align: right;
+  margin-top: 10px;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .records-list {
+    font-size: 0.9rem;
+  }
+
+  .deposit-sum {
+    font-size: 1rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .form-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 5px;
+  }
+
+  .records-list {
+    font-size: 0.8rem;
+  }
+
+  .deposit-sum {
+    font-size: 0.9rem;
+  }
+
+  .primary-button {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+}
+
+/* 입금조회와 입금액 글자 크기 맞추기 */
+.deposit-sum {
+  font-size: 1rem; /* 입금조회와 동일한 크기로 설정 */
+}
+
+.deposit-check-label {
+  font-size: 1rem; /* 입금조회 글자 크기 */
+}
+/* 대출요청 오른쪽으로 20px 이동 */
+.loan-preference-label {
+  margin-left: 20px;
+}
+
+.hidden-row {
+  display: none;
+}
+
+/* 파일 선택 다이얼로그 스타일 */
+.file-selection-dialog {
+    position: fixed;
+    left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-selection-content {
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    min-width: 500px;
+    max-width: 80vw;
+    max-height: 80vh;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.file-selection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.file-selection-title {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.file-selection-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.file-selection-close:hover {
+    background-color: #f0f0f0;
+}
+
+.file-search-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.file-list {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    min-height: 300px;
+    max-height: 400px;
+}
+
+.file-item {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.file-item:hover {
+    background-color: #f5f5f5;
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-preview {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 12px;
+    border: 1px solid #eee;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.file-description {
+    font-size: 12px;
+    color: #666;
+}
+
+.file-selection-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.file-selection-button {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-selection-button:hover {
+    background: #f0f0f0;
+}
+
+.file-selection-button.primary {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.file-selection-button.primary:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
