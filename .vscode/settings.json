@@ -1,0 +1,12 @@
+{
+    "git.ignoreLimitWarning": true,
+    "bitoAI.codeCompletion.enableAutoCompletion": false,
+    "html.validate.styles": false,
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": false,
+        "plaintext": false
+    },
+    "github.copilot.chat.localeOverride": "ko"
+}
+

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MKF Data Management</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>MKF Data Management</h1>
+        <div id="search-fields" class="filter-section">
+            <!-- First Row: ID, Nationality, Visa Type, Status -->
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label for="idFilter">ID:</label>
+                    <input type="text" id="idFilter" placeholder="Search by ID">
+                </div>
+                <div class="filter-item">
+                    <label for="nationality">Nationality:</label>
+                    <select id="nationality">
+                        <option value="All">All</option>
+                        <option value="Cambodia">Cambodia</option>
+                        <option value="Nepal">Nepal</option>
+                        <option value="Vietnam">Vietnam</option>
+                        <option value="Philippines">Philippines</option>
+                        <option value="Thailand">Thailand</option>
+                        <option value="Mongolia">Mongolia</option>
+                        <option value="Indonesia">Indonesia</option>
+                        <option value="Sri Lanka">Sri Lanka</option>
+                        <option value="Uzbekistan">Uzbekistan</option>
+                        <option value="Pakistan">Pakistan</option>
+                        <option value="Myanmar">Myanmar</option>
+                        <option value="Kyrgyzstan">Kyrgyzstan</option>
+                        <option value="Bangladesh">Bangladesh</option>
+                        <option value="East Timor">East Timor</option>
+                        <option value="Laos">Laos</option>
+                        <option value="China">China</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label for="nameFilter">Name:</label>
+                    <input type="text" id="nameFilter" placeholder="Search by Name">
+                </div>
+
+                <div class="filter-item">
+                    <label for="passportFilter">Passport Number:</label>
+                    <input type="text" id="passportFilter" placeholder="Search by Passport Number">
+                </div>
+
+                <div class="filter-item">
+                    <label for="mkf_status">Status:</label>
+                    <select id="mkfStatus">
+                        <option value="전체">전체</option>
+                        <option value="0">초기값</option>
+                        <option value="1">sign_1 Regist</option>
+                        <option value="2">sign_2 Regist</option>
+                        <option value="3">입금완료</option>
+                        <option value="4">처리완료</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!--2nd Row: Commit Date, Search, Reset -->
+        <div class="filter-row" style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <label for="commitDateFrom">Commit Date (확약일자):</label>
+                <input type="text" id="commitDateFrom" placeholder="YYMMDD" maxlength="6" pattern="\d{6}"
+                    style="width: 80px;">
+                <span class="date-separator">~</span>
+                <input type="text" id="commitDateTo" placeholder="YYMMDD" maxlength="6" pattern="\d{6}"
+                    style="width: 80px;">
+            </div>
+            <div style="display: inline-block; margin: 0 10px;">
+                <label>
+                    <input type="radio" name="jobGubun" id="jobGubunN" value="N" checked>
+                    N
+                </label>
+                <label>
+                    <input type="radio" name="jobGubun" id="jobGubunE" value="E">
+                    E
+                </label>
+            </div>
+            <button id="searchButton" class="primary-button">Search (조회)</button>
+            <div style="display: flex; align-items: center; gap: 10px; margin-left: 10px;">
+                <label class="deposit-check-label" for="depositCheck">입금조회</label>
+                <input type="checkbox" id="depositCheck" />
+                <label class="nodeposit-check-label" for="noepositCheck">미입금조회</label>
+                <input type="checkbox" id="nodepositCheck" />
+                <label class="loan-preference-label" for="loanPreferenceCheck">대출요청</label>
+                <input type="checkbox" id="loanPreferenceCheck" />
+                <span class="deposit-sum">입금합계: <strong id="deposit-sum">0</strong></span>
+                <span class="record-count">Search Results: <strong id="totalRecords">0</strong></span>
+            </div>
+
+        </div>
+        <div class="button-row" style="display: flex; justify-content: flex-start; gap: 10px; margin-top: 5px;">
+            <button id="txt2MembersButton" class="secondary-button">Text to Members</button>
+            <!-- <button id="newMembersButton" class="secondary-button">New Member</button> -->
+            <button id="viewMembersButton" class="secondary-button">V</button>
+            <button id="excelInputButton" class="secondary-button">gSign Regist</button>
+            <button id="bankDepositButton" class="secondary-button">ABA Bank Deposit</button>
+            <button id="compareButton" class="secondary-button">Compare</button>
+            <button id="downloadExcelButton" class="secondary-button" style="margin-left:8px;">Download</button>
+            <button id="openingCheckButton" class="secondary-button" style="margin-left:8px;">Opening Check</button>
+            <button id="resetButton" class="primary-button" style="margin-left:auto;">Reset</button>
+            <button id="helpButton" class="secondary-button">Help</button>
+        </div>
+        
+        <!-- Help 모달 UI -->
+        <div id="helpModal" style="display: none; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 10001; align-items: center; justify-content: center;">
+            <div style="background: #fff; border-radius: 10px; padding: 30px; min-width: 500px; max-width: 90vw; box-shadow: 0 4px 24px rgba(0,0,0,0.3); position: relative;">
+                <button onclick="document.getElementById('helpModal').style.display='none'" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
+                <h3 style="margin-top: 0; color: #333; margin-bottom: 25px;">도움말 - 기능 선택</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="search" style="margin: 0;">
+                            <span>Search (검색)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="txt2Members" style="margin: 0;">
+                            <span>Text to Members</span>
+                        </label>
+                        <!-- <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="newMembers" style="margin: 0;">
+                            <span>New Member</span>
+                        </label> -->
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="viewMembers" style="margin: 0;">
+                            <span>V</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="excelInput" style="margin: 0;">
+                            <span>gSign Regist</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="bankDeposit" style="margin: 0;">
+                            <span>ABA Bank Deposit</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="compare" style="margin: 0;">
+                            <span>Compare</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="downloadExcel" style="margin: 0;">
+                            <span>Download</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="openingCheck" style="margin: 0;">
+                            <span>Opening Check</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="helpFunction" value="reset" style="margin: 0;">
+                            <span>Reset</span>
+                        </label>
+                    </div>
+                    
+                    <!-- 확인/취소 버튼 -->
+                    <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                        <button id="cancelHelpButton" class="secondary-button" style="padding: 12px 30px; font-size: 16px; min-width: 100px;">취소</button>
+                        <button id="confirmHelpButton" class="primary-button" style="padding: 12px 30px; font-size: 16px; min-width: 100px;">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Excel 파일 처리 UI -->
+        <div id="excelProcessingUI" style="display: none; position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+            <div style="background: #fff; border-radius: 10px; padding: 30px; min-width: 500px; max-width: 90vw; box-shadow: 0 4px 24px rgba(0,0,0,0.3); position: relative;">
+                <button onclick="document.getElementById('excelProcessingUI').style.display='none'" style="position: absolute; right: 15px; top: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
+                <h3 style="margin-top: 0; color: #333; margin-bottom: 25px;">Excel 파일 처리</h3>
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- 입력 파일 선택 -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label for="inputPath" style="font-weight: bold; color: #333;">입력 파일:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="inputPath" placeholder="입력 파일 경로를 선택하세요" readonly style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+                            <button id="selectInputButton" class="secondary-button">파일 선택</button>
+                            <input type="file" id="inputFileInput" accept=".xlsx, .xls" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <!-- 출력 파일 선택 -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label for="outputPath" style="font-weight: bold; color: #333;">출력 파일:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="outputPath" placeholder="저장할 파일명을 입력하거나 파일을 선택하세요" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <button id="selectOutputButton" class="secondary-button">파일 선택</button>
+                            <input type="file" id="outputFileInput" accept=".xlsx, .xls" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <!-- 확인/취소 버튼 -->
+                    <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                        <button id="cancelExcelButton" class="secondary-button" style="padding: 12px 30px; font-size: 16px; min-width: 100px;">취소</button>
+                        <button id="processExcelButton" class="primary-button" style="padding: 12px 30px; font-size: 16px; min-width: 100px;">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Hidden File Input -->
+        <input type="file" id="newMembersFileInput" accept=".xlsx, .xls" style="display: none;">
+        <input type="file" id="sourceExcelFile" accept=".xlsx, .xls, .xlsb, .csv" style="display: none;">
+        <input type="file" id="depositCheckInput" accept=".xlsx, .xls" style="display: none;">
+        <input type="file" id="bankDepositInput" accept=".xlsx, .xls, .csv" style="display: none;">
+        <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.bmp,.tiff" multiple style="display: none;">
+    </div>
+    </div>
+
+    <!-- 페이지 어디든 추가 -->
+    <div id="bankDepositCheckResult" style="margin-top:16px;"></div>
+    <div id="resultModal"
+        style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999; align-items:center; justify-content:center;">
+        <div
+            style="background:#fff; border-radius:10px; padding:24px 32px; min-width:320px; max-width:90vw; box-shadow:0 4px 24px #0002; position:relative;">
+            <button onclick="document.getElementById('resultModal').style.display='none'"
+                style="position:absolute; right:16px; top:12px; background:none; border:none; font-size:20px; cursor:pointer;">×</button>
+            <div id="resultModalContent"></div>
+        </div>
+    </div>
+    <div class="content" id="main-content">
+        <div id="list-view" class="list-view">
+            <table class="detailed-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nationality</th>
+                        <th>Name</th>
+                        <th>Visa Type</th>
+                        <th>Passport Number</th>
+                        <th>Phone Type</th>
+                        <th>Sim Price</th>
+                        <th>Deposit</th>
+                        <th>Balance</th>
+                        <th>Loan Preference</th>
+                        <th>Entry Date</th>
+                        <th>Korea Tel Number</th>
+                    </tr>
+                </thead>
+                <tbody id="records-list"></tbody>
+            </table>
+        </div>
+
+        <div id="detail-view" class="hidden">
+            <!-- <button id="back-button">Back to List</button> -->
+            <div id="detail-content"></div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Compare 전용 화면 (처음엔 숨김) -->
+    <div id="compare-content" style="display:none; width:100vw; min-height:100vh;">
+        <div style="display:flex; flex-direction:row; height:100vh;">
+            <div
+                style="flex:1; border-right:2px solid #eee; padding:32px 24px 24px 24px; overflow:auto; display:flex; flex-direction:column;">
+                <h2 style="text-align:center; margin-bottom:24px; font-size:2rem;">MKF MASTER</h2>
+                <div id="compareLeftContent" style="flex:1; min-height:60vh;"></div>
+            </div>
+            <div style="flex:1; padding:32px 24px 24px 24px; overflow:auto; display:flex; flex-direction:column;">
+                <h2 style="text-align:center; margin-bottom:24px; font-size:2rem;">ERROR DATA</h2>
+                <div id="compareRightContent" style="flex:1; min-height:60vh;"></div>
+            </div>
+        </div>
+        <button id="compareBackButton"
+            style="position:fixed; top:24px; right:32px; z-index:10001; font-size:1.2rem;">뒤로가기</button>
+    </div>
+
+    <!-- Members 전용 화면 (처음엔 숨김) -->
+    <div id="members-content" style="display:none; width:100vw; min-height:100vh;">
+        <div style="display:flex; flex-direction:row; height:100vh;">
+            <div
+                style="flex:1; border-right:2px solid #eee; padding:32px 24px 24px 24px; overflow:auto; display:flex; flex-direction:column;">
+                <h2 style="text-align:center; margin-bottom:24px; font-size:2rem;">DETAILED DATA</h2>
+                <div id="membersLeftContent" style="flex:1; min-height:60vh;">
+                    <table id="membersTable"></table>
+                </div>
+            </div>
+            <div style="flex:1; padding:32px 24px 24px 24px; overflow:auto; display:flex; flex-direction:column;">
+                <h2 style="text-align:center; margin-bottom:24px; font-size:2rem;">NEW MEMBERS DATA</h2>
+                <div id="membersRightContent" style="flex:1; min-height:60vh;">
+                </div>
+            </div>
+        </div>
+        <button id="membersBackButton"
+            style="position:fixed; top:24px; right:32px; z-index:10001; font-size:1.2rem;">뒤로가기</button>
+    </div>
+
+    <!-- XLSX 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    
+    <!-- 이미지 전처리 스크립트 -->
+    <script>
+    // 이미지 전처리 함수들
+    async function preprocessImage(imagePath) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 캔버스 크기 설정 (이미지 크기에 따라 조정)
+                const maxWidth = 2000;
+                const maxHeight = 2000;
+                let { width, height } = img;
+                
+                // 이미지가 너무 크면 리사이즈
+                if (width > maxWidth || height > maxHeight) {
+                    const ratio = Math.min(maxWidth / width, maxHeight / height);
+                    width *= ratio;
+                    height *= ratio;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                // 이미지 그리기
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // 이미지 데이터 가져오기
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                // 대비 개선 및 노이즈 제거
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    // 그레이스케일 변환
+                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                    
+                    // 이진화 (임계값 적용)
+                    const threshold = 128;
+                    const binary = gray > threshold ? 255 : 0;
+                    
+                    // 결과 적용
+                    data[i] = binary;     // R
+                    data[i + 1] = binary; // G
+                    data[i + 2] = binary; // B
+                    // Alpha는 그대로 유지
+                }
+                
+                // 처리된 이미지 데이터를 캔버스에 다시 그리기
+                ctx.putImageData(imageData, 0, 0);
+                
+                // 캔버스를 Blob으로 변환
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    resolve(url);
+                }, 'image/png');
+            };
+            
+            img.onerror = function() {
+                // 전처리 실패 시 원본 이미지 반환
+                console.warn('이미지 전처리 실패, 원본 이미지 사용');
+                resolve(imagePath);
+            };
+            
+            img.src = imagePath;
+        });
+    }
+    
+    // 고급 이미지 전처리 함수 (여러 방법 시도)
+    async function advancedPreprocessImage(imagePath) {
+        const methods = [
+            preprocessWithBinarization,
+            preprocessWithContrastEnhancement,
+            preprocessWithNoiseReduction
+        ];
+        
+        const results = [];
+        
+        for (let i = 0; i < methods.length; i++) {
+            try {
+                const result = await methods[i](imagePath);
+                results.push(result);
+            } catch (error) {
+                console.warn(`전처리 방법 ${i + 1} 실패:`, error);
+            }
+        }
+        
+        // 원본 이미지도 추가
+        results.push(imagePath);
+        
+        return results;
+    }
+    
+    // 이진화를 통한 전처리
+    async function preprocessWithBinarization(imagePath) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                ctx.drawImage(img, 0, 0);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                // 적응형 이진화
+                const threshold = calculateAdaptiveThreshold(data);
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                    const binary = gray > threshold ? 255 : 0;
+                    
+                    data[i] = binary;
+                    data[i + 1] = binary;
+                    data[i + 2] = binary;
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    resolve(url);
+                }, 'image/png');
+            };
+            
+            img.onerror = () => resolve(imagePath);
+            img.src = imagePath;
+        });
+    }
+    
+    // 대비 향상을 통한 전처리
+    async function preprocessWithContrastEnhancement(imagePath) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                ctx.drawImage(img, 0, 0);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                // 히스토그램 평활화
+                const histogram = new Array(256).fill(0);
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+                    histogram[gray]++;
+                }
+                
+                // 누적 분포 함수 계산
+                const cdf = new Array(256);
+                cdf[0] = histogram[0];
+                for (let i = 1; i < 256; i++) {
+                    cdf[i] = cdf[i - 1] + histogram[i];
+                }
+                
+                // 정규화
+                const totalPixels = canvas.width * canvas.height;
+                for (let i = 0; i < 256; i++) {
+                    cdf[i] = Math.round((cdf[i] / totalPixels) * 255);
+                }
+                
+                // 픽셀 값 변환
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+                    const enhanced = cdf[gray];
+                    
+                    data[i] = enhanced;
+                    data[i + 1] = enhanced;
+                    data[i + 2] = enhanced;
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    resolve(url);
+                }, 'image/png');
+            };
+            
+            img.onerror = () => resolve(imagePath);
+            img.src = imagePath;
+        });
+    }
+    
+    // 노이즈 제거를 통한 전처리
+    async function preprocessWithNoiseReduction(imagePath) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                ctx.drawImage(img, 0, 0);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                // 중간값 필터 적용
+                const filteredData = new Uint8ClampedArray(data.length);
+                const kernelSize = 3;
+                const halfKernel = Math.floor(kernelSize / 2);
+                
+                for (let y = 0; y < canvas.height; y++) {
+                    for (let x = 0; x < canvas.width; x++) {
+                        const idx = (y * canvas.width + x) * 4;
+                        
+                        const rValues = [];
+                        const gValues = [];
+                        const bValues = [];
+                        
+                        // 커널 내의 픽셀들 수집
+                        for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+                            for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+                                const nx = x + kx;
+                                const ny = y + ky;
+                                
+                                if (nx >= 0 && nx < canvas.width && ny >= 0 && ny < canvas.height) {
+                                    const nIdx = (ny * canvas.width + nx) * 4;
+                                    rValues.push(data[nIdx]);
+                                    gValues.push(data[nIdx + 1]);
+                                    bValues.push(data[nIdx + 2]);
+                                }
+                            }
+                        }
+                        
+                        // 중간값 계산
+                        rValues.sort((a, b) => a - b);
+                        gValues.sort((a, b) => a - b);
+                        bValues.sort((a, b) => a - b);
+                        
+                        const medianIdx = Math.floor(rValues.length / 2);
+                        
+                        filteredData[idx] = rValues[medianIdx];
+                        filteredData[idx + 1] = gValues[medianIdx];
+                        filteredData[idx + 2] = bValues[medianIdx];
+                        filteredData[idx + 3] = data[idx + 3]; // Alpha
+                    }
+                }
+                
+                const newImageData = new ImageData(filteredData, canvas.width, canvas.height);
+                ctx.putImageData(newImageData, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    resolve(url);
+                }, 'image/png');
+            };
+            
+            img.onerror = () => resolve(imagePath);
+            img.src = imagePath;
+        });
+    }
+    
+    // 적응형 임계값 계산
+    function calculateAdaptiveThreshold(data) {
+        let sum = 0;
+        let count = 0;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+            sum += gray;
+            count++;
+        }
+        
+        return sum / count;
+    }
+    
+    // 전역 함수로 노출
+    window.preprocessImage = preprocessImage;
+    window.advancedPreprocessImage = advancedPreprocessImage;
+    
+    // Help 모달 기능
+    document.addEventListener('DOMContentLoaded', function() {
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const confirmHelpButton = document.getElementById('confirmHelpButton');
+        const cancelHelpButton = document.getElementById('cancelHelpButton');
+        
+        // Help 버튼 클릭 시 모달 열기
+        if (helpButton) {
+            helpButton.addEventListener('click', function() {
+                helpModal.style.display = 'flex';
+            });
+        }
+        
+        // 취소 버튼 클릭 시 모달 닫기
+        if (cancelHelpButton) {
+            cancelHelpButton.addEventListener('click', function() {
+                helpModal.style.display = 'none';
+                // 라디오 버튼 선택 해제
+                const radioButtons = document.querySelectorAll('input[name="helpFunction"]');
+                radioButtons.forEach(radio => radio.checked = false);
+            });
+        }
+        
+        // 확인 버튼 클릭 시 선택된 기능에 대한 도움말 표시
+        if (confirmHelpButton) {
+            confirmHelpButton.addEventListener('click', function() {
+                const selectedFunction = document.querySelector('input[name="helpFunction"]:checked');
+                if (selectedFunction) {
+                    const functionValue = selectedFunction.value;
+                    showHelpContent(functionValue);
+                    helpModal.style.display = 'none';
+                } else {
+                    alert('도움말을 볼 기능을 선택해 주세요.');
+                }
+            });
+        }
+        
+        // 선택된 기능에 대한 도움말 내용 표시 - helpContent.js 파일에서 정의됨
+    });
+    </script>
+    
+    <!-- Help Content 스크립트 파일 -->
+    <script src="js/helpContent.js"></script>
+    
+    <!-- Your main.js 파일 추가 -->
+    <script src="/js/newMembers.js"></script>
+    <script src="/js/newMembersV.js"></script>
+    <script src="/js/mkfCommon.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/excelRegist.js"></script>
+    <script src="js/bankDepositCheck.js"></script>
+    <script src="js/compareData.js"></script>
+    <script src="js/excelDownload.js"></script>
+    <script src="js/imageToExcel.js"></script>
+    <script src="js/txt2Members.js"></script>
+</body>
+
+</html>
