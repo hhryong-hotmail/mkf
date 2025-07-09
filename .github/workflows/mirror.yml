@@ -1,0 +1,22 @@
+# GitHub Action to mirror the repository to another repository
+name: Mirror to Partners Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to partners repository
+        env:
+          PARTNERS_PAT: ${{ secrets.PARTNERS_PAT }}
+        run: |
+          git push https://x-access-token:${{ env.PARTNERS_PAT }}@github.com/MKFpartners/mkf.git main --force

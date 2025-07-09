@@ -60,7 +60,14 @@ document
           }
 
           const updates = filteredRows.map(row => {
-            const senderOrReceiver = row['Sender']
+            // Description에서 'REMARK: ' 다음 단어 추출, 없으면 Sender 사용
+            let senderOrReceiver = row['Sender'];
+            if (row['Description'] && typeof row['Description'] === 'string') {
+              const match = row['Description'].match(/REMARK: (\S+)/);
+              if (match) {
+                senderOrReceiver = match[1];
+              }
+            }
             const depositAmount = row['Amount']
             // '20-May-25' → '2025-05-20'로 변환
             let transactionDate = row['Transaction date']
