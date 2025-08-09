@@ -345,7 +345,7 @@ document
 
                   // 서버에 요청
                   try {
-                    const response = await fetch('/api/new-members', {
+                    const response = await fetch('/api/select-new-members', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(data)

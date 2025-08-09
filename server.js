@@ -40,7 +40,8 @@ pool.query('SELECT NOW()', (err, res) => {
 // 정적 파일 제공 설정
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: true }))
 
 // Multer 설정 - 이미지 파일 업로드용
 const storage = multer.diskStorage({
@@ -554,15 +555,11 @@ app.get('/api/error-data', async (req, res) => {
   }
 })
 
-app.get('/api/members-data', async (req, res) => {
-  const { commit_date, passport_name, nationality } = req.query
+app.get('/api/select-new-members', async (req, res) => {
+  const { passport_name, nationality } = req.query
   
-  let sql = 'SELECT * FROM new_members WHERE 1=1'
+  let sql = 'SELECT * FROM new_members WHERE 1=1 AND mkf_status = 1'
   const params = []
-  if (commit_date && commit_date.trim() !== '') {
-    sql += ' AND commit_date::date = $' + (params.length + 1)
-    params.push(commit_date)
-  }
   if (nationality && nationality !== 'All') {
     sql += ' AND nationality = $' + (params.length + 1)
     params.push(nationality)
@@ -574,7 +571,9 @@ app.get('/api/members-data', async (req, res) => {
   sql += ' ORDER BY id DESC'
 
   try {
+    console.log('Executing query for /api/select-new-members:', sql, 'with params:', params)
     const result = await pool.query(sql, params)
+
     res.json(result.rows)
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -611,15 +610,30 @@ app.post('/api/records', async (req, res) => {
 })
 app.post('/execute-query', async (req, res) => {
   const { queries } = req.body 
+  
+  // 실시간 모니터링을 위한 로깅
+  console.log('=== Execute Query 요청 시작 ===')
+  console.log(`총 쿼리 개수: ${queries ? queries.length : 0}`)
+  console.log('받은 쿼리들:')
+  if (queries && Array.isArray(queries)) {
+    queries.forEach((query, index) => {
+      console.log(`[${index + 1}/${queries.length}] ${query}`)
+    })
+  }
+  console.log('================================')
+  
   let errorCount = 0
   let errorList = []
   const results = []
   
   for (const query of queries) {
     try {
+      console.log(`실행 중: ${query}`) // 각 쿼리 실행 시 로깅
       await pool.query(query)
       results.push({ status: 'success' })
+      console.log(`✓ 성공: ${query}`)
     } catch (err) {
+      console.log(`✗ 실패: ${query} - 오류: ${err.message}`)
       results.push({ status: 'fail', error: err.message })
       errorCount++
     }
@@ -691,12 +705,12 @@ app.post('/api/records/update-opening', async (req, res) => {
   }
 })
 
-app.post('/api/new-members', async (req, res) => {
+app.post('/api/update-new-members', async (req, res) => {
   const data = req.body;
   try {
     const query = `
       SELECT update_new_members(
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
       ) AS id
     `;
     function emptyToNull(value) {
@@ -715,12 +729,66 @@ app.post('/api/new-members', async (req, res) => {
       data.p_nationality,
       data.p_error_code,
       data.p_error_message,
-      emptyToNull(data.p_entry_date)
+      emptyToNull(data.p_entry_date),
+      parseInt(data.p_mkf_status) || 1
     ];
+    console.log('Executing query for /api/update-new-members:', query, 'with values:', values);
     const result = await pool.query(query, values);
     res.json({ id: result.rows[0].id });
   } catch (err) {
-    console.error('Error in /api/new-members:', err);
+    console.error('Error in /api/update-new-members:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// New to MKF Master 처리 API
+app.post('/api/new-to-mkf', async (req, res) => {
+  const data = req.body;
+  try {
+    // p_passport_number 검증
+    if (!data.p_passport_number || data.p_passport_number.trim() === '') {
+      return res.status(400).json({ error: 'passport_number는 필수 항목입니다.' });
+    }
+    
+    if (data.p_passport_number.length > 9) {
+      return res.status(400).json({ error: 'passport_number는 9자리를 초과할 수 없습니다.' });
+    }
+    
+    // 날짜 형식 변환 함수
+    function formatDateForPostgreSQL(dateStr) {
+      if (!dateStr || dateStr.trim() === '') {
+        return null;
+      }
+      // YYYY-MM-DD 형식인지 확인
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (dateRegex.test(dateStr.trim())) {
+        return dateStr.trim();
+      }
+      return null;
+    }
+    
+    const query = `
+      SELECT new_to_mkf_master(
+        $1, $2, $3, $4, $5, $6, $7, $8
+      ) AS result
+    `;
+    function emptyToNull(value) {
+      return value === '' ? null : value;
+    }
+    const values = [
+      data.p_passport_name,
+      data.p_gender,
+      formatDateForPostgreSQL(data.p_date_of_birth),
+      data.p_tel_number,
+      data.p_signyn,
+      data.p_passport_number.trim(),
+      data.p_nationality,
+      formatDateForPostgreSQL(data.p_entry_date)
+    ];
+    const result = await pool.query(query, values);
+    res.json({ result: result.rows[0].result });
+  } catch (err) {
+    console.error('Error in /api/new-to-mkf:', err);
     res.status(500).json({ error: err.message });
   }
 });

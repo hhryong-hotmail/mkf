@@ -1,22 +1,3 @@
-document.getElementById('newMembersButton').addEventListener('click', () => {
-  const password = prompt('암호를 입력하십시오:')
-  if (password === null) {
-    // 사용자가 Cancel을 눌렀을 경우
-    alert('작업이 취소되었습니다.')
-    return
-  }
-  if (password !== '2233') {
-    alert('잘못된 암호입니다. 작업이 취소되었습니다.')
-    return
-  }
-  const fileInput = document.getElementById('newMembersFileInput')
-  if (fileInput) {
-    fileInput.click() // 사용자 상호작용 내에서 파일 선택 대화 상자 열기
-  } else {
-    console.error('파일 입력 요소를 찾을 수 없습니다.')
-  }
-})
-
 // File Selection Event
 document
   .getElementById('newMembersFileInput')

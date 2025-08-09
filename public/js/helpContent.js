@@ -78,9 +78,11 @@ function showHelpContent(functionType) {
         'compare': {
             title: 'Compare',
             description: 'error_table과 mkf_master 데이터를 비교하여 수정하는 기능입니다.\n' +
-            '새로 등록하려는 인원은 new_members 테이블에 입력합니다 \n' +
-            'glosign 서명 자료, 입금 거래 내역, sim카드에 따른 입금 내역 등이 원칙에 맞지 않을 경우엔 error_table에 입력됩니다 \n' +
-            'compare 버튼을 클릭하면 두 테이블(mkf_table, error_table)의 데이터를 비교하여 차이점을 확인하고 수정하여 mkf_master에 저장할 수 있습니다 \n' ,
+            'glosign 서명 자료, 입금 거래 내역, passport_number, sim카드에 따른 입금 내역 등이 원칙에 맞지 않을 경우엔 error_table에 입력됩니다 \n' +
+            'compare 버튼을 클릭하면 두 테이블(mkf_table, error_table)의 데이터를 비교하여 차이점을 확인하고 수정하여 mkf_master에 저장할 수 있습니다 \n' +
+            '1.우측 error_table의 데이터를 검색합니다 \n' +
+            '2.error_table의 데이터를 클릭하면 좌측에 상세히 표시됩니다 \n' +
+            '3.좌측 항목을 수정하면 그것이 mkf_master의 데이터에 입력됩니다. ',
             images: [
                 'help/compare-help1.png',
                 'help/compare-help2.png'

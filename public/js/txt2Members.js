@@ -95,29 +95,65 @@ async function processTxtFiles(files) {
             const lines = content.split('\n').map(line => line.trim()).filter(line => line);
             let idx = 0;
             while (idx < lines.length) {
-                // 1. No: 순수 숫자
-                if (!/^[0-9]+$/.test(lines[idx])) { idx++; continue; }
-                const no = lines[idx];
-                idx++;
-                // 2. Name: 영어
-                if (idx >= lines.length || !/^[A-Za-z ]+$/.test(lines[idx])) continue;
-                const name = lines[idx];
-                idx++;
-                // 3. Gender: M/F, 아니면 공란
-                let gender = '';
-                if (idx < lines.length && /^[MF]$/.test(lines[idx])) {
-                    gender = lines[idx];
+                // 빈 라인이나 크메르어/기타 언어 헤더는 건너뛰기
+                if (!lines[idx] || lines[idx].trim() === '') {
                     idx++;
                 }
-                // 4. Birth: YYYY-MM-DD, 아니면 공란
-                let birth = '';
-                if (idx < lines.length && /^\d{4}-\d{2}-\d{2}$/.test(lines[idx])) {
-                    birth = lines[idx];
+                
+                // 크메르어나 기타 비ASCII 문자가 포함된 라인 건너뛰기
+                else if (/[^\x00-\x7F]/.test(lines[idx])) {
+                    //console.log("크메르어/기타 언어 라인 건너뛰기:", lines[idx]);
                     idx++;
                 }
-                // 쿼리 생성
-                queries.push(`select * from insert_into_new_members('${no}'::text,'${name}'::text,'${gender}'::text,'${birth}'::date);`);
-                console.log(`${no}, ${name}, ${gender}, ${birth}`);
+                
+                // 1. No: 순수 숫자이고 길이가 8 미만인 경우 먼저 찾기
+                else if (/^[0-9]+$/.test(lines[idx]) && lines[idx].length < 8) {
+                    const no = lines[idx];
+                    idx++;
+                    console.log("-----------------------------------")
+                    console.log("no=", no);
+
+                    let name = '';
+                    // no 다음 줄부터 name 조건을 만족하는 줄을 찾을 때까지 반복
+                    while (idx < lines.length) {
+                        const nameCandidate = lines[idx].replace(/\s+/g, ' ').trim();
+                        if (nameCandidate === '' || /[^A-Za-z .\-]/.test(nameCandidate)) {
+                            // 빈 줄, 이상한 문자, 조건 불일치 시 skip
+                            //console.log("이름 조건 불일치:", lines[idx]);
+                            idx++;
+                        } else if (/^[A-Za-z .\-]+$/.test(nameCandidate)) {
+                            name = nameCandidate;
+                            console.log("name=", name);
+                            idx++;
+                            break;
+                        } else {
+                            idx++;
+                        }
+                    }
+                    // no, name 모두 set된 경우에만 쿼리 push
+                    if (no && name) {
+                        let gender = '';
+                        if (idx < lines.length && /^[MF]$/.test(lines[idx])) {
+                            gender = lines[idx];
+                            idx++;
+                        }
+                        console.log("gender=", gender);
+                        let birth = '';
+                        if (idx < lines.length && /^\d{4}-\d{2}-\d{2}$/.test(lines[idx])) {
+                            birth = lines[idx];
+                            idx++;
+                        }
+                        console.log("birth=", birth);
+                        const birthValue = birth ? `'${birth}'::date` : 'null';
+                        queries.push(`select * from insert_into_new_members('${no}'::text,'${name}'::text,'${gender}'::text,${birthValue});`);
+                        console.log(`no=${no}, name=${name}, gender=${gender}, birth=${birth}`);
+                    } else {
+                        console.log("no=" + no + " - 이름이 없어서 건너뜀");
+                    }
+                } else {
+                    // 조건에 맞지 않는 라인은 건너뛰기
+                    idx++;
+                }
             }
         } catch (error) {
             alert(`파일 "${file.name}" 처리 중 오류: ${error.message}`);
